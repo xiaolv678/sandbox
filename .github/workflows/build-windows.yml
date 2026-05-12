@@ -1,0 +1,36 @@
+name: Build Windows App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install build dependencies
+        run: py -m pip install -r requirements-build.txt
+
+      - name: Run tests
+        run: py -m unittest discover
+
+      - name: Build executable
+        run: py -m PyInstaller --clean calculator.spec
+
+      - name: Upload Windows app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Calculator-Windows
+          path: dist/Calculator.exe
